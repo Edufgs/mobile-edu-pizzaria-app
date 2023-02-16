@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useContext } from "react";
 import { 
   View, 
   Text, 
@@ -7,8 +7,21 @@ import {
   TextInput, //entrada de texto
   TouchableOpacity //Botao de toque
 } from "react-native";
+import { AuthContext } from '../../contexts/AuthContext'
 
 export default function SignIn(){
+  const { user } = useContext(AuthContext)
+  
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  function handleLogin(){
+    //Verifica se está vazio
+    if(email === '' || password === ''){
+      return
+    }
+  }
+
   return(
     //Adiciona um grupo de estilo no componente
     <View style={styles.container}>
@@ -27,14 +40,19 @@ export default function SignIn(){
           style={styles.input}
           placeholder="Digite seu email"
           placeholderTextColor="#F0F0F0" //Cor do placeholder
+          value={email}
+          onChangeText={setEmail}
         />
         <TextInput
           style={styles.input}
           placeholder="Digite sua senha"
           placeholderTextColor="#F0F0F0"
           secureTextEntry={true} //Deixa mascarado a senha 
+          value={password}
+          onChangeText={setPassword}
         />
-        <TouchableOpacity style={styles.button}>
+
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Acessar</Text>
         </TouchableOpacity>
       </View>
