@@ -1,4 +1,4 @@
-import React, { useState, createContext, ReactNode } from 'react'
+import React, { useState, createContext, ReactNode, useEffect } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { api } from '../services/api'
 
@@ -9,7 +9,10 @@ import { api } from '../services/api'
 type AuthContextData = {
   user: UserProps;
   isAuthenticated: boolean;
-  signIn:(credencials: SignInProps) => Promise<void>;
+  signIn:(credencials: SignInProps) => Promise<void>; //Está mandando uma função em vez de uma variavel
+  loadingAuth: boolean;
+  loading: boolean;
+  signOut: () => Promise<void>; //Está mandando uma função em vez de uma variavel
 }
 
 type SignInProps = {
@@ -40,9 +43,37 @@ export function AuthProvider({children}: AuthProviderProps){
 
   //Controle para ver se está carregando.
   const [loadingAuth, setLoadingAuth] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   //!! = Converte para boolean. Se tiver algo então é true.
   const isAuthenticated = !!user.name;
+
+  //Quando o componente dor montado, é executado esse useEffect
+  useEffect(() =>{
+    //Pegar os dados salvos do user
+    async function getUser() {
+      const userInfo = await AsyncStorage.getItem('@edupizzaria');
+      //Transforma em objeto novamente se tiver algo
+      let hasUser: UserProps = JSON.parse(userInfo || '{}');
+
+      //Verificar se recebeu as informações dele.
+      if(Object.keys(hasUser).length > 0){
+        api.defaults.headers.common['Authorization'] = `Bearer ${hasUser.token}`
+
+        setUser({
+          id: hasUser.id,
+          name: hasUser.name,
+          email: hasUser.email,
+          token: hasUser.token
+        })
+      }
+
+      setLoading(false);
+
+    }
+
+    getUser();
+  }, [])
 
   async function signIn({email, password}: SignInProps) {
     setLoadingAuth(true); //inicia o loading
@@ -60,7 +91,7 @@ export function AuthProvider({children}: AuthProviderProps){
         ...response.data
       }
 
-      await AsyncStorage.setItem('@edupizaaria', JSON.stringify(data));
+      await AsyncStorage.setItem('@edupizzaria', JSON.stringify(data));
 
       //Set o token nas resquisições da api
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`
@@ -80,9 +111,29 @@ export function AuthProvider({children}: AuthProviderProps){
     }
   }
 
+  async function signOut() {
+    await AsyncStorage.clear()
+    .then(() => {
+      setUser({
+        id: '',
+        name:'',
+        email: '',
+        token: ''
+      })
+    })    
+  }
+
   return(
     //Cria o contexto
-    <AuthContext.Provider value={{ user, isAuthenticated, signIn }}>
+    <AuthContext.Provider 
+      value={{ 
+        user, 
+        isAuthenticated, 
+        signIn, 
+        loadingAuth, 
+        loading,
+        signOut
+      }}>
       {/* Fica todas as paginas pois o contexto fica em volta a aplicação */}
       {children}
     </AuthContext.Provider>

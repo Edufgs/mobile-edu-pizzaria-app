@@ -11,8 +11,7 @@ import { AuthContext } from '../contexts/AuthContext'
  */
 
 function Routes(){
-  const { isAuthenticated } = useContext(AuthContext); //Verifica se está autenticado
-  const loading = false; //Verifica se está carregando (controle de load)
+  const { isAuthenticated, loading } = useContext(AuthContext); //Verifica se está autenticado
 
   //Verifica se está carregando e se tiver coloca um spinner rodando
   if(loading){
