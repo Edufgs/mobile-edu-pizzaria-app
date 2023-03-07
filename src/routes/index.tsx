@@ -1,10 +1,9 @@
-import React from "react";
-
+import React, { useContext } from "react";
 //ActivityIndicator é o spinner que fica rodando
 import { View, ActivityIndicator } from 'react-native'
-
 import AppRoutes from "./app.routes";
 import AuthRoutes from "./auth.routes";
+import { AuthContext } from '../contexts/AuthContext'
 
 /**
  * Pagina de rotas.
@@ -12,7 +11,7 @@ import AuthRoutes from "./auth.routes";
  */
 
 function Routes(){
-  const IsAuthenticated = false; //Verifica se está autenticado
+  const { isAuthenticated } = useContext(AuthContext); //Verifica se está autenticado
   const loading = false; //Verifica se está carregando (controle de load)
 
   //Verifica se está carregando e se tiver coloca um spinner rodando
@@ -40,7 +39,7 @@ function Routes(){
 
   return(
     //Se ele estiver true então rederiza o componente "AppRoutes" se não rederiza o "AuthRoutes"
-    IsAuthenticated ? <AppRoutes/> : <AuthRoutes/>
+    isAuthenticated ? <AppRoutes/> : <AuthRoutes/>
   )
 }
 
