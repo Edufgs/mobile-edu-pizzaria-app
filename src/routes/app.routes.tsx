@@ -20,7 +20,11 @@
         * Precisa do "name" (Nome da tela).
         * Precisa dizer qual "component" que vai ser renderizado.
         */}
-       <Stack.Screen name="DashBoard" component={DashBoard}/>
+       <Stack.Screen 
+          name="DashBoard" 
+          component={DashBoard}
+          options={{ headerShown: false }}
+        />
      </Stack.Navigator>
    )
  }
